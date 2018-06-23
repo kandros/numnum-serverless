@@ -1,0 +1,7 @@
+{
+  "name": "scheduler",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "jaga santagostino <jagasantagostino@gmail.com> (https://jagasantagostino.com)",
+  "license": "MIT"
+}

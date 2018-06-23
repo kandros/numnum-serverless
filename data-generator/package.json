@@ -1,0 +1,7 @@
+{
+  "name": "data-generator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "jaga santagostino <jagasantagostino@gmail.com> (https://jagasantagostino.com)",
+  "license": "MIT"
+}

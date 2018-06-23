@@ -1,0 +1,63 @@
+{
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description":
+    "Periodically polls an SQS queue and asynchronously consumes each message.",
+  "Resources": {
+    "QueuePending": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": "numnum-pending"
+      }
+    },
+    "QueueMessagesGenerator": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Policies": ["AmazonSQSFullAccess"],
+        "Handler": "data-generator.handler",
+        "Runtime": "nodejs8.10",
+        "CodeUri": "./data-generator/",
+        "Description": "Generates messages and sends them to a SQS queue.",
+        "Timeout": 10,
+        "Environment": {
+          "Variables": {
+            "QUEUE_URL": { "Ref": "QueuePending" }
+          }
+        }
+      }
+    },
+    "Scheduler": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Policies": ["AmazonSQSFullAccess", "AWSLambdaFullAccess"],
+        "Handler": "scheduler.handler",
+        "Runtime": "nodejs8.10",
+        "CodeUri": "./scheduler/",
+        "Description":
+          "Polls an SQS queue and invoke workers to consume each message.",
+        "Timeout": 10,
+        "Environment": {
+          "Variables": {
+            "QUEUE_URL": { "Ref": "QueuePending" },
+            "WORKER_SUM": { "Ref": "WorkerSum" }
+          }
+        }
+      }
+    },
+    "WorkerSum": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Policies": ["AmazonSQSFullAccess"],
+        "Handler": "sum.handler",
+        "Runtime": "nodejs8.10",
+        "CodeUri": "./worker-sum/",
+        "Description": "sum the nums received in the payload message.",
+        "Timeout": 10,
+        "Environment": {
+          "Variables": {
+            "QUEUE_URL": { "Ref": "QueuePending" }
+          }
+        }
+      }
+    }
+  }
+}
